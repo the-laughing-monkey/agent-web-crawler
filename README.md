@@ -121,13 +121,13 @@ Python 3.10 and Docker Desktop knowledge
 3. Then to commit a file, with the example ID of 9eab03b20c79 you could do the following:
 
    ```
-   docker commit 9eab03b20c79 my-web-crawler:v1 
+   docker commit 9eab03b20c79 my-agent-web-crawler:v1 
    ```
 
 4. To update it, simply get the new version number with ps -a and then update the version number:
 
    ```
-   docker commit 7xa60b22a092 my-web-crawler:v1 
+   docker commit 7xa60b22a092 my-agent-web-crawler:v2 
    ```
 
 
