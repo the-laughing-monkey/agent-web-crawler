@@ -1,0 +1,11 @@
+aiohttp==3.8.3
+pandas==1.4.2
+playwright==1.22.0
+openai==1.14.2
+beautifulsoup4==4.11.1
+langchain==0.1.0  # Note: Replace with latest version
+langchain-community==0.0.29
+aiofiles
+pytest
+pytest-asyncio
+unittest
