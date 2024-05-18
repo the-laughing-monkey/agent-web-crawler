@@ -13,6 +13,23 @@ Python 3.10 and Docker Desktop knowledge
 
 ### Let's Get Started Now
 
+## CRITICAL NOTE ##
+If you want to use GPT to score a product/company, you will need to modify the prompts-and-plans/prompt-scoring.txt file with your own questions and then set the purpose to scoring in the gpt_summarizer.py file.
+
+Then RENAME prompt-scorting.txt.EXAMPLE to prompt-scoring.txt.
+
+The prompt in gpt_summarizer.py is set to:          
+
+   ```
+   elif purpose == "scoring":
+         with open('prompts-and-plans/prompt-scoring.txt', 'r') as file:
+            prompt_scoring_file = file.read()
+
+         prompt = f"Please carefully review this scoring system and then output only SCORE: {{X}} and FUZZY SCORE: {{Y}} where X is a score from -12 to 12, based on the criteria in the scoring system, and Y is a string that can be HORRIBLE, PASSABLE, GOOD, VERYGOOD, EXCELLENT, based on the rules in the scoring system. Finally return your analysis of how you came to your conclusion with ANALYSIS: {{analysis}}.\n\n{prompt_scoring_file}\n\n{content}"
+   ```
+
+Adjust YOUR scoring based on the questions you add to the prompt-scoring.txt file.  Currently scoring goes from -12 to 12 because my set of proprietary questions is 12 questions long.  If you want to change that you will need to adjust the scoring.py file as well.
+
 ## Creating a Persistent Docker Volume
 
 1. Open Docker Desktop.
@@ -23,7 +40,7 @@ Python 3.10 and Docker Desktop knowledge
 ## Configuring Docker Environment on MacOS
 
 1. Open Terminal.
-2. Add Docker to your PATH if you are using a Mac or Linux:
+2. Add Docker to your PATH:
    ```
    export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/"
    ```
@@ -32,19 +49,19 @@ Python 3.10 and Docker Desktop knowledge
 
 1. For Apple Arm Silicon, launch an x64 instance of Ubuntu:
    ```
-   docker run -it --platform linux/amd64 --shm-size=2gb --name my-web-crawler -v container-storage:/data ubuntu /bin/bash -c "tail -f /dev/null"
+   docker run -it --platform linux/amd64 --shm-size=2gb --name my-ubuntu -v container-storage:/data ubuntu /bin/bash -c "tail -f /dev/null"
    ```
-   Alternatively, use a pre-built image if available (Currently the below image is NOT publically avaiable so make your own from the default Ubuntu image by following the instructions here in this readme and then do a "docker commit"):
+   Alternatively, use a pre-built image if available:
    ```
-   docker run -it --platform linux/amd64 --shm-size=2gb --name my-web-crawler -v container-storage:/data my-agent-web-crawler:v2 /bin/bash -c "tail -f /dev/null"
+   docker run -it --platform linux/amd64 --shm-size=2gb --name my-ubuntu -v container-storage:/data my-agent-web-crawler:v2 /bin/bash -c "tail -f /dev/null"
    ```
-   The running image will be referred to as `my-web-crawler`.
+   The running image will be referred to as `my-ubuntu`.
 
 ## Accessing the Container
 
 1. Open a new Terminal tab and connect to the container:
    ```
-   docker exec -it my-web-crawler /bin/bash
+   docker exec -it my-ubuntu /bin/bash
    ```
 2. Inside the container, create a directory in `/data`:
    ```
@@ -55,7 +72,7 @@ Python 3.10 and Docker Desktop knowledge
 
 1. Copy necessary files from your local machine to the container:
    ```
-   docker cp /local/path/to/my/files/agent-web-crawler my-web-crawler:/data/
+   docker cp /local/path/to/my/files/agent-web-crawler my-ubuntu:/data/
    ```
 
 ## Setting Environment Variables Inside the Container
@@ -95,7 +112,7 @@ Python 3.10 and Docker Desktop knowledge
 
 ## Testing Browser Launch
 
-1. Manually launch Google Chrome to verify installation.  This will make a little PNG in the current directoy, a screenshot of the Google webpage.  That will let you know it's working:
+1. Manually launch Google Chrome to verify installation:
    ```
    /usr/bin/google-chrome-stable --headless --no-sandbox --disable-gpu --no-zygote --dump-dom https://www.google.com/
    ```
@@ -127,24 +144,16 @@ Python 3.10 and Docker Desktop knowledge
 4. To update it, simply get the new version number with ps -a and then update the version number:
 
    ```
-   docker commit 7xa60b22a092 my-agent-web-crawler:v2 
+   docker commit 7xa60b22a092 my-agent-web-crawler:v1 
    ```
 
 
 ## Running the Web Crawler Script
 
-1. Execute the web crawler script with the following command to log to stdout and stderr:
+1. Execute the web crawler script with the following command to log to stdout and stderr and to a log file (which happens automatically now):
    ```
-   python3.10 websucker.py --start --state ./data/state.txt --input ./data/input_file.csv --output ./data/output_file.csv --max-concurrent-browsers 5
+   python3.10 websucker.py --start --input ./data/input_file.csv --output ./data/output_file.csv --max-concurrent-browsers 5
 
-   ```
-
-2. Also, please NOTE if you want to log to a file instead, logging via the --logfile switch is broken (to be fixed in a later iteration) so just use &> at the end of the script to log to a file until it is fixed in later updates.
-
-To start the main script with your own settings:
-
-   ```
-   python3.10 websucker.py --start ./data/state.txt --input ./data/input_file.csv --output ./data/output_file.csv --max-concurrent-browsers 5
    ```
 
 ## Additional Script Management Commands and Examples
@@ -155,22 +164,23 @@ To start the main script with default settings:
   python websucker.py --start
   ```
 
-To start the main script with all your own settings and log to a file instead of the screen, do the following:
+To start the main script and force it to download content again instead of using cached local content use the --refresh switch.
   
   ```
-  python websucker.py --start --input your_input_file.csv --output your_output_file.csv --max-concurrent-browsers 5 &> ./data/agent-crawler.log
+  python websucker.py --start --input your_input_file.csv --output your_output_file.csv --max-concurrent-browsers 5 --refresh
+  ```
+
+
+To start the main script with all your own settings and to log to a file instead of the screen do the following:
+  
+  ```
+  python websucker.py --start --input your_input_file.csv --output your_output_file.csv --max-concurrent-browsers 5 --logfile your_log_file.log
   ```
 
 To set the max concurrent browsers:
 
   ```
    python websucker.py --max-concurrent-browsers 5
-  ```
-
-To log to a file:
-
-  ```
-   python websucker.py --start &> ./data/agent-crawler.log
   ```
 
 To stop the main script:
