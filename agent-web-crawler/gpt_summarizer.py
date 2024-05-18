@@ -1,14 +1,23 @@
-import asyncio
+import re
 import openai
 from openai import AsyncOpenAI
-from settings import OPENAI_API_KEY
+import logging
+from settings import OPENAI_API_KEY, MODEL, MAX_OUTPUT_TOKENS
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 class GPTSummarizer:
     def __init__(self):
         # Create an instance of the AsyncOpenAI class
         self.client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
-    async def summarize(self, content: str, purpose: str = "summary") -> str:
+    async def summarize(self, content: str, purpose: str = "summary", heuristics=None) -> str:
+        if content is None or "Already processed" in content or "Error in processing" in content:
+            logger.error(f"Invalid content for summarization with purpose {purpose}")
+            return "No content provided"
+                
+        messages = []
         if purpose == "summary":
             messages = [
                 {"role": "system", "content": "You are a helpful assistant who provides summaries."},
@@ -19,18 +28,52 @@ class GPTSummarizer:
                 {"role": "system", "content": "You are a helpful assistant who extracts pricing information."},
                 {"role": "user", "content": f"Extract pricing information from this content:\n{content}"}
             ]
-        else:
-            raise ValueError("Unsupported purpose specified.")
+        elif purpose == "scoring":
+            with open('prompts-and-plans/prompt-scoring.txt', 'r') as file:
+                prompt_scoring_file = file.read()
+
+            prompt = f"Please carefully review this scoring system and then output only SCORE: {{X}} and FUZZY SCORE: {{Y}} where X is a score from -12 to 12, based on the criteria in the scoring system, and Y is a string that can be HORRIBLE, PASSABLE, GOOD, VERYGOOD, EXCELLENT, based on the rules in the scoring system. Finally return your analysis of how you came to your conclusion with ANALYSIS: {{analysis}}.\n\n{prompt_scoring_file}\n\n{content}"
+
+            messages = [
+                {"role": "system", "content": "You are a helpful assistant who provides scoring based on given criteria."},
+                {"role": "user", "content": prompt}
+            ]
 
         try:
-            # Use the client instance to create the chat completion asynchronously
+
+            # Print the messages to standard output
+            #print(f"Sending messages to GPT API: {messages}")
+            print(f"Sending messages to GPT API: {str(messages)[:200]}")
+
             response = await self.client.chat.completions.create(
-                model="gpt-4-1106-preview",
-                messages=messages
+                model=MODEL,
+                messages=messages,
+                max_tokens=MAX_OUTPUT_TOKENS
             )
-            # Extract and return the text from the response
             response_message = response.choices[0].message.content.strip()
-            return response_message
+
+            if purpose == "scoring":
+                score_match = re.search(r'SCORE:\s*(-?\d+)', response_message)
+
+                fuzzy_scores = ["VERYGOOD", "EXCELLENT", "GOOD", "PASSABLE", "HORRIBLE"]
+                fuzzy_score = None
+
+                for score in fuzzy_scores:
+                    if score in response_message:
+                        fuzzy_score = score
+                        break
+
+                if fuzzy_score is None:
+                    fuzzy_score = "Fuzzy score N/A"
+                    
+                analysis_match = re.search(r'ANALYSIS:(.*)', response_message, re.DOTALL)
+
+                score = int(score_match.group(1)) if score_match else 0
+                analysis = analysis_match.group(1).strip() if analysis_match else "Analysis not available"
+
+                return score, fuzzy_score, analysis
+            else:
+                return response_message
         except Exception as e:
-            print(f"Error during GPT interaction for {purpose}: {str(e)}")
-            return "Error in processing content"
+            logger.error(f"Error during GPT interaction for {purpose}: {str(e)}")
+            return f"Error in processing content: {str(e)}"

@@ -1,0 +1,65 @@
+# **Rules for GPT to Assess the Product**<a id="rules-for-gpt-to-assess-the-product"></a>
+
+# **Points System**<a id="points-system"></a>
+
+- Read each question and assign one of the following numbers to that question based on your assessment of the question based on reading through the website text:
+
+  - -1 point ==  “very strong no”.
+
+  - 0 points == “no” or “unclear/unable to make a determination”.
+
+  - 1 point == “yes”.
+
+  - 2 points == very strong yes.
+
+- Sometimes we provide specific instructions with the tag “Special Scoring Instructions:” to show you how to score that particular question.  These instructions overall the default system of scoring for that question only. Use that specific set of instructions to assign the score for that particular question.
+
+- At the end, total up all the points and return the following:
+
+  - Total score: {score}   # where score is an INT
+
+- In addition return the following:
+
+  - Fuzzy score: {fuzzy-score} # where fuzzy-score is calculated as follows:
+
+    - -12 to 0 == HORRIBLE
+
+    - 1 to 3 == PASSABLE
+
+    - 4 to 7 == GOOD
+
+    - 8 to 9 == VERYGOOD
+
+    - 10 to 11 == EXCELLENT
+
+- If the webpage text is only an anti-bot text or security CAPTCHA the total numerical score is automatically 0.
+
+- We are not interested in any tools that do certain kinds of activities or business.  If you feel that the software/tools/website you are reviewing do any of the following things then the total {score} for the app is automatically 0 and there is no need to assess the software/website based on any of the other criteria:
+
+  - No tools that facilitate crime, such as fraud or creating attack programs.
+
+# **Questions** <a id="questions"></a>
+
+1. Is the software product valuable to a business or individual? 
+
+- Some further evaluation criteria and examples to answer question 1:
+
+  - Does it save time or money for an individual or an organization?
+
+    - For example, does it make hiring faster and cheaper?
+
+    - Does it eliminate or reduce repetitive work?
+
+    - Does it let a smaller team do more work with less people or get more work out of the same size team?  
+
+      - For example, in the past it required a big team to build an app that reached 100s of millions of people but WhatsApp’s team of engineers had only 50 engineers and was able to reach 100s of millions of users because they had strong building blocks of software to work from and did not have to create everything from scratch.
+
+      - Another example is that in the past it required a large team to build a good website, but there are now many templates and semi-automated website building programs that are very good, enabling small teams to build great looking functional websites for much less money and potentially somewhat less time.
+
+    - Is it attempting to automate or streamline an operations and capital intensive process? Then yes it is valuable if it is successful in doing this. 
+
+2. Does the company have a chance to build a strong moat?  
+
+   - A moat means a lasting business that is very difficult to challenge in the market.  Typically it means they have a very unique product offering or service or many dedicated customers and it would be very hard to duplicate.  Very few products fall into this category so choose wisely.
+
+

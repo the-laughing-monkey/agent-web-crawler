@@ -4,6 +4,7 @@ import signal
 import sys
 import os
 import logging
+from utils import setup_logging
 from settings import (
     DEFAULT_STATE_FILE,
     DEFAULT_INPUT_FILE,
@@ -12,8 +13,10 @@ from settings import (
     MAX_CONCURRENT_BROWSERS,
     DEFAULT_LOG_FILE
 )
-# Logging to logfile is still broken but it can be called via &> at the end of a script so all good
-from utils import setup_logging
+
+# Setup logging
+logger = logging.getLogger()
+
 
 # Update the command to run the main script using the orchestrator module
 MAIN_SCRIPT_CMD = ["python3", "orchestrator.py"]
@@ -21,10 +24,11 @@ MAIN_SCRIPT_CMD = ["python3", "orchestrator.py"]
 # PID file for tracking the main script's process
 PID_FILE = "main.pid"
 
-def start_process(args, max_concurrent_browsers):
+def start_process(args, max_concurrent_browsers, refresh):
     max_concurrent_browsers_arg = ["--max-concurrent-browsers", str(max_concurrent_browsers)]
+    refresh_arg = ["--refresh"] if refresh else []
     with open(PID_FILE, 'w') as pid_file:
-        process = subprocess.Popen(MAIN_SCRIPT_CMD + max_concurrent_browsers_arg + args)
+        process = subprocess.Popen(MAIN_SCRIPT_CMD + max_concurrent_browsers_arg + refresh_arg + args)
         pid_file.write(str(process.pid))
     logging.info("Process started with PID: %s", process.pid)
 
@@ -56,6 +60,7 @@ def resume_process():
     else:
         logger.info("No paused process to resume.")
 
+
 def main():
     parser = argparse.ArgumentParser(description="Wrapper script to control the execution of the main script.")
     parser.add_argument("--start", action="store_true", help="Start the main script.")
@@ -67,14 +72,12 @@ def main():
     parser.add_argument("--output", type=str, default=DEFAULT_OUTPUT_FILE, help="Path to the output file.")
     parser.add_argument("--logfile", type=str, default=DEFAULT_LOG_FILE, help="Path to the log file where logs will be written.")
     parser.add_argument("--max-concurrent-browsers", type=int, default=MAX_CONCURRENT_BROWSERS, help="Maximum number of concurrent browsers.")
-    
+    parser.add_argument("--refresh", action="store_true", help="Force refresh of cached content.")
+        
     args = parser.parse_args()
     
     # Set up logging with the default log file if --logfile is not specified
     setup_logging(LOG_LEVEL, args.logfile if args.logfile else None)
-
-    # Now that logging is setup, call orchestrator main
-    from orchestrator import main as orchestrator_main
 
     main_script_args = []
     if args.state:
@@ -85,7 +88,7 @@ def main():
         main_script_args += ["--output", args.output]
 
     if args.start:
-        start_process(main_script_args, args.max_concurrent_browsers)
+        start_process(main_script_args, args.max_concurrent_browsers, args.refresh)
     elif args.stop:
         stop_process()
     elif args.pause:

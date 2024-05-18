@@ -3,8 +3,9 @@ import os
 
 # OpenAI API settings
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-GPT_ENGINE = "gpt-4-turbo"
-GPT_MAX_TOKENS = 120000
+MODEL = "gpt-4o"
+MAX_INPUT_TOKENS = 119000
+MAX_OUTPUT_TOKENS = 4096
 
 # Playwright browser settings
 BROWSER_EXECUTABLE_PATH = "/usr/bin/google-chrome-stable"
@@ -28,10 +29,10 @@ BROWSER_ARGS = [
 MAX_CONCURRENT_BROWSERS = 5
 
 # File paths
-DEFAULT_STATE_FILE = "script_state.json"
-DEFAULT_INPUT_FILE = "input_file.csv"
-DEFAULT_OUTPUT_FILE = "output_with_summaries_and_pricing.csv"
-DEFAULT_LOG_FILE = "web-crawler-agent.log" 
+DEFAULT_STATE_FILE = "data/script_state.json"
+DEFAULT_INPUT_FILE = "data/input_file.csv"
+DEFAULT_OUTPUT_FILE = "data/output_with_analysis.csv"
+DEFAULT_LOG_FILE = "data/web-crawler-agent.log" 
 
 # Logging settings
 LOG_LEVEL = logging.INFO
