@@ -11,7 +11,7 @@ It uses a combination of [GPT-4](https://platform.openai.com/docs/api-reference/
 Python 3.10 and Docker Desktop knowledge
 
 
-### Let's Get Started Now
+Let's Get Started Now
 
 ## CRITICAL NOTE ##
 If you want to use GPT to score a product/company, you will need to modify the prompts-and-plans/prompt-scoring.txt file with your own questions and then set the purpose to scoring in the gpt_summarizer.py file.
