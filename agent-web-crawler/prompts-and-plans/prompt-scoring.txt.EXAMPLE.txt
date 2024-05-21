@@ -32,17 +32,19 @@
 
   - Fuzzy score: {fuzzy-score} # where fuzzy-score is calculated as follows:
 
-    - 0 to 2 == BAD
+    -1 == ERROR    
 
-    - 3 to 4 == PASSABLE
+    0 to 2 == BAD
 
-    - 5 to 6 == GOOD
+    3 to 4 == PASSABLE
 
-    - 7 to 8 == VERYGOOD
+    5 to 6 == GOOD
 
-    - 9 to 10 == EXCELLENT
+    7 to 8 == VERYGOOD
 
-- There is also a special case where we give a fuzzy-score of ERROR. If the webpage text is only an anti-bot text or security CAPTCHA the total numerical score is automatically 0 and return a fuzzy score of ERROR.
+    9 to 10 == EXCELLENT
+
+- There is also a special case where we give a fuzzy-score of ERROR. If the webpage text is only an anti-bot text or security CAPTCHA the total numerical score is automatically -1 and return a fuzzy score of ERROR.
 
 - We are not interested in any tools that do certain kinds of activities or business.  If you feel that the software/tools/website you are reviewing do any of the following things then the total score for the app is automatically 0 and there is no need to assess the software/website based on any of the other criteria:
 
