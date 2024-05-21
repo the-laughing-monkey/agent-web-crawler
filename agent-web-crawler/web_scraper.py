@@ -34,7 +34,9 @@ class WebScraper:
                 logger.debug(f"Using cached content for {url}")
                 summary = await self.gpt_summarizer.summarize(main_content, purpose="summary")
                 pricing = await self.gpt_summarizer.summarize(pricing_content, purpose="pricing")
-                score, fuzzy_score, analysis = await self.gpt_summarizer.summarize(main_content, purpose="scoring")
+                # Combine main content and pricing content for scoring
+                combined_content = main_content + " " + pricing_content
+                score, fuzzy_score, analysis = await self.gpt_summarizer.summarize(combined_content, purpose="scoring")
                 # Update the state file to mark the URL as processed
                 self.file_manager.update_processed_urls(state_file, url)
                 return (name, url, summary, pricing, analysis, score, fuzzy_score)
@@ -79,11 +81,17 @@ class WebScraper:
                     processed_pricing_chunks = self.content_processor.chunk_text(clean_pricing_text, MAX_INPUT_TOKENS)
                     pricing = await self.gpt_summarizer.summarize(" ".join(processed_pricing_chunks), purpose="pricing")
                     self.file_manager.save_cached_content(name, url, clean_text, clean_pricing_text)
+                    
+                    # Combine main content and pricing content for scoring
+                    combined_text = " ".join(processed_text_chunks) + " " + clean_pricing_text
                 else:
                     pricing = "No pricing information found."
                     self.file_manager.save_cached_content(name, url, clean_text, "")
+                    
+                    # Use only main content for scoring
+                    combined_text = " ".join(processed_text_chunks)
 
-                score, fuzzy_score, analysis = await self.gpt_summarizer.summarize(" ".join(processed_text_chunks), purpose="scoring")
+                score, fuzzy_score, analysis = await self.gpt_summarizer.summarize(combined_text, purpose="scoring")
 
                 await browser.close()
                 return (name, url, summary, pricing, analysis, score, fuzzy_score)

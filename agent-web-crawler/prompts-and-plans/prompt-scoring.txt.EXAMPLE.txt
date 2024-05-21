@@ -4,39 +4,50 @@
 
 - Read each question and assign one of the following numbers to that question based on your assessment of the question based on reading through the website text:
 
-  - -1 point ==  “very strong no”.
-
   - 0 points == “no” or “unclear/unable to make a determination”.
 
   - 1 point == “yes”.
 
-  - 2 points == very strong yes.
-
 - Sometimes we provide specific instructions with the tag “Special Scoring Instructions:” to show you how to score that particular question.  These instructions overall the default system of scoring for that question only. Use that specific set of instructions to assign the score for that particular question.
 
-- At the end, total up all the points and return the following:
+- At the end, after you have assessed every question, list all of your numerical answers next to the question number and then add all the points together to get the TOTAL SCORE.  Be careful to use the exact number you gave for your answer.  Highest possible score is 10. Lowest possible score is 0.
 
-  - Total score: {score}   # where score is an INT
+   Example:
+
+      1) 0
+      2) 1
+      3) 1
+      4) 0
+      5) 0
+      6) 0
+      7) 1
+      8) 0
+      9) 0
+      10) 1
+
+   MATH: 0+1+1+0+0+0+1+0+0+1 = 5
+   TOTAL SCORE: 5
 
 - In addition return the following:
 
   - Fuzzy score: {fuzzy-score} # where fuzzy-score is calculated as follows:
 
-    - -12 to 0 == HORRIBLE
+    - 0 to 2 == BAD
 
-    - 1 to 3 == PASSABLE
+    - 3 to 4 == PASSABLE
 
-    - 4 to 7 == GOOD
+    - 5 to 6 == GOOD
 
-    - 8 to 9 == VERYGOOD
+    - 7 to 8 == VERYGOOD
 
-    - 10 to 11 == EXCELLENT
+    - 9 to 10 == EXCELLENT
 
-- If the webpage text is only an anti-bot text or security CAPTCHA the total numerical score is automatically 0.
+- There is also a special case where we give a fuzzy-score of ERROR. If the webpage text is only an anti-bot text or security CAPTCHA the total numerical score is automatically 0 and return a fuzzy score of ERROR.
 
-- We are not interested in any tools that do certain kinds of activities or business.  If you feel that the software/tools/website you are reviewing do any of the following things then the total {score} for the app is automatically 0 and there is no need to assess the software/website based on any of the other criteria:
+- We are not interested in any tools that do certain kinds of activities or business.  If you feel that the software/tools/website you are reviewing do any of the following things then the total score for the app is automatically 0 and there is no need to assess the software/website based on any of the other criteria:
 
   - No tools that facilitate crime, such as fraud or creating attack programs.
+
 
 # **Questions** <a id="questions"></a>
 
@@ -58,8 +69,12 @@
 
     - Is it attempting to automate or streamline an operations and capital intensive process? Then yes it is valuable if it is successful in doing this. 
 
-2. Does the company have a chance to build a strong moat?  
+2. Is the product MORE than a simple wrapper for ChatGPT, Claude Opus or another chatbot?
 
-   - A moat means a lasting business that is very difficult to challenge in the market.  Typically it means they have a very unique product offering or service or many dedicated customers and it would be very hard to duplicate.  Very few products fall into this category so choose wisely.
+   - By this question we mean that many applications are simply chatbots accessed via API but don’t have any additional features or complicated programming to make the application work.  
 
+   - For example, an agent based application that carries out complex, open ended tasks for a user, that is powered by an LLM like ChatGPT requires a lot of additional coding/logic so it is NOT a wrapper. ChatGPT embedded in a web application to chat with users IS a wrapper.  Can I instantly know what it is, without having to read a lot of the page?
 
+################################
+## ADD more questions here.  
+## Be sure to adjust the total scoring here AND in gpt-summarizer's prompt for how to score or you will get bad results.  Original scoring is based on 10 questions total.

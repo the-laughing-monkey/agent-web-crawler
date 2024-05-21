@@ -32,7 +32,7 @@ class GPTSummarizer:
             with open('prompts-and-plans/prompt-scoring.txt', 'r') as file:
                 prompt_scoring_file = file.read()
 
-            prompt = f"Please carefully review this scoring system and then output only SCORE: {{X}} and FUZZY SCORE: {{Y}} where X is a score from -12 to 12, based on the criteria in the scoring system, and Y is a string that can be HORRIBLE, PASSABLE, GOOD, VERYGOOD, EXCELLENT, based on the rules in the scoring system. Finally return your analysis of how you came to your conclusion with ANALYSIS: {{analysis}}.\n\n{prompt_scoring_file}\n\n{content}"
+            prompt = f"Please carefully review this scoring system and then output only SCORE: {{X}} and FUZZY SCORE: {{Y}} where X is a score from 0 to 10, with 0 being the lowest possible score and 10 being the highest possible score. Y is a string that can be BAD, PASSABLE, GOOD, VERYGOOD, EXCELLENT, based on the returned TOTAL SCORE in the scoring system. There is also a special case of ERROR for fuzzy score, described in the further instructions.  Finally, and most importantly, return your analysis of how you came to your conclusion with ANALYSIS: {{analysis}}.\n\n{prompt_scoring_file}\n\n{content}"
 
             messages = [
                 {"role": "system", "content": "You are a helpful assistant who provides scoring based on given criteria."},
@@ -55,7 +55,7 @@ class GPTSummarizer:
             if purpose == "scoring":
                 score_match = re.search(r'SCORE:\s*(-?\d+)', response_message)
 
-                fuzzy_scores = ["VERYGOOD", "EXCELLENT", "GOOD", "PASSABLE", "HORRIBLE"]
+                fuzzy_scores = ["VERYGOOD", "EXCELLENT", "GOOD", "PASSABLE", "BAD", "ERROR"]
                 fuzzy_score = None
 
                 for score in fuzzy_scores:
